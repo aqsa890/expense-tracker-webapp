@@ -9,7 +9,7 @@ services:
     volumes:
       - ./mysql-data:/var/lib/mysql
     networks:
-      - appbridge
+      - expense-app-nw
     healthcheck:
       test: ["CMD","mysqladmin","ping","-h","localhost","-uroot","-pTest@123"]
       interval: 10s
@@ -18,23 +18,24 @@ services:
       start_period: 30s
     restart: always
 
-  mainapp:
-    image: snehcreate/expensetracker_v3
-    container_name: Expensetracker
+  java_app:
+    build:
+     context: .
+    container_name: "expenseapp"
+    networks: 
+     - expense-app-nw
     environment:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/expenses_tracker?allowPublicKeyRetrieval=true&useSSL=false"
       SPRING_DATASOURCE_PASSWORD: Test@123
     ports:
       - "8080:8080"
-    networks:
-      - appbridge
     depends_on:
       - mysql
     restart: always
 
 networks:
-  appbridge:
+  expense-app-nw:
 
 volumes:
   mysql-data:

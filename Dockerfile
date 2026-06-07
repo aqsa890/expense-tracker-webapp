@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Copy source code from local to container
 
-COPY . /app
+COPY . .
 
 # Build application and skip test cases
 
@@ -26,7 +26,7 @@ RUN mvn clean install -DskipTests=true
 
 # Import small size java image
 
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app 
 
