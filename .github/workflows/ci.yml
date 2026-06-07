@@ -9,6 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: Test@123
+          MYSQL_DATABASE: expenses_tracker
+        ports:
+          - 3306:3306
+        options: >
+          --health-cmd='mysqladmin ping --silent' --health-interval=10s --health-timeout=5s --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +39,12 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build and test with Maven
-        run: mvn -B clean verify
+        run: |
+          # wait for MySQL service to be available
+          for i in {1..30}; do
+            nc -z mysql 3306 && break || sleep 2
+          done
+          mvn -B clean verify
 
   docker-build:
     needs: build
